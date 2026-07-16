@@ -14,7 +14,7 @@ export async function generateMetadata(
 
   const { data: product } = await supabase
     .from('items')
-    .select('name, description, image_url')
+    .select('name, description, image_urls')
     .eq('slug', slug)
     .single();
 
@@ -28,7 +28,7 @@ export async function generateMetadata(
     openGraph: {
       title: product.name,
       description: product.description?.substring(0, 160) || `Придбати ${product.name} в Coffee Broadway. Крафтова кава та інвентар.`,
-      images: product.image_url ? [product.image_url] : [],
+      images: product.image_urls && product.image_urls.length > 0 ? [product.image_urls[0]] : [],
     },
   }
 }
