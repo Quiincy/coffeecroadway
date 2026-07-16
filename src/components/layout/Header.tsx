@@ -104,11 +104,11 @@ export default function Header({ categories = [] }: { categories?: any[] }) {
         
         {/* Right Side: Icons */}
         <div className="flex items-center gap-2 sm:gap-4 lg:gap-5 shrink-0">
-          <button onClick={() => setIsSearchOpen(true)} className="text-white hover:text-brand-500 transition-colors p-1">
+          <button onClick={() => setIsSearchOpen(true)} className="hidden lg:flex items-center text-white hover:text-brand-500 transition-colors p-1">
             <Search size={22} />
           </button>
           
-          <Link href="/favorites" className="relative text-white hover:text-brand-500 transition-colors p-1">
+          <Link href="/favorites" className="hidden lg:flex items-center relative text-white hover:text-brand-500 transition-colors p-1">
             <Heart size={22} />
             {favorites.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-brand-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">
@@ -142,6 +142,32 @@ export default function Header({ categories = [] }: { categories?: any[] }) {
         }`}
       >
         <div className="flex flex-col p-6 gap-2 pb-24">
+          <div className="flex gap-4 mb-6">
+            <button 
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                setIsSearchOpen(true);
+              }} 
+              className="flex-1 flex items-center justify-center gap-2 bg-zinc-900 border border-zinc-800 text-white p-3 rounded-xl hover:text-brand-500 hover:border-brand-500/50 transition-colors font-bold text-sm"
+            >
+              <Search size={20} />
+              ПОШУК
+            </button>
+            <Link 
+              href="/favorites" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex-1 flex items-center justify-center gap-2 bg-zinc-900 border border-zinc-800 text-white p-3 rounded-xl hover:text-brand-500 hover:border-brand-500/50 transition-colors font-bold relative text-sm"
+            >
+              <Heart size={20} />
+              УЛЮБЛЕНЕ
+              {favorites.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-brand-500 text-white text-[11px] font-bold h-5 w-5 rounded-full flex items-center justify-center shadow-lg border-2 border-zinc-950">
+                  {favorites.length}
+                </span>
+              )}
+            </Link>
+          </div>
+
           <div className="mb-4">
             <h3 className="text-zinc-500 text-xs font-bold uppercase tracking-widest mb-4">Навігація</h3>
             <div className="flex flex-col border border-zinc-800 rounded-2xl overflow-hidden bg-zinc-900/50">
