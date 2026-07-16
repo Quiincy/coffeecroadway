@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/components/providers/CartProvider";
@@ -8,6 +8,13 @@ import { SettingsProvider, SiteSettings } from "@/components/providers/SettingsP
 import { createClient } from "@/utils/supabase/server";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://coffeebroadway-467110713551.europe-west1.run.app'),
@@ -31,7 +38,7 @@ export default async function RootLayout({
 
   return (
     <html lang="uk" className="dark">
-      <body className={`${inter.className} bg-zinc-950 text-zinc-50 antialiased min-h-screen flex flex-col selection:bg-brand-500/30 selection:text-brand-500`}>
+      <body className={`${inter.className} bg-zinc-950 text-zinc-50 antialiased min-h-screen flex flex-col overflow-x-hidden selection:bg-brand-500/30 selection:text-brand-500`}>
         <SettingsProvider initialSettings={initialSettings}>
           <FavoritesProvider>
             <CompareProvider>
