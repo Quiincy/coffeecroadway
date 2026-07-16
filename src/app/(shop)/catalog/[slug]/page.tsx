@@ -1,8 +1,37 @@
+import type { Metadata, ResolvingMetadata } from "next";
 import { notFound } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { AnimatedPage } from "@/components/ui/AnimatedPage";
 import { ProductDetailsClient } from "@/components/ui/ProductDetailsClient";
 import { RecentlyViewed } from "@/components/ui/RecentlyViewed";
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { slug } = await params;
+  const supabase = await createClient();
+
+  const { data: product } = await supabase
+    .from('items')
+    .select('name, description, image_url')
+    .eq('slug', slug)
+    .single();
+
+  if (!product) {
+    return {};
+  }
+
+  return {
+    title: `${product.name} | Coffee Broadway`,
+    description: product.description?.substring(0, 160) || `Придбати ${product.name} в Coffee Broadway. Крафтова кава та інвентар.`,
+    openGraph: {
+      title: product.name,
+      description: product.description?.substring(0, 160) || `Придбати ${product.name} в Coffee Broadway. Крафтова кава та інвентар.`,
+      images: product.image_url ? [product.image_url] : [],
+    },
+  }
+}
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const supabase = await createClient();
