@@ -10,6 +10,7 @@ import { createClient } from "@/utils/supabase/server";
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://coffeebroadway-467110713551.europe-west1.run.app'),
   title: "Coffee Broadway | Крафтова кава та інвентар",
   description: "Крафтова кава та професійний інвентар для кав'ярень.",
 };
