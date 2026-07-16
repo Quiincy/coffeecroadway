@@ -4,7 +4,7 @@ import React, { useState, ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 
 interface AccordionProps {
-  title: string;
+  title: ReactNode;
   children: ReactNode;
   defaultOpen?: boolean;
 }

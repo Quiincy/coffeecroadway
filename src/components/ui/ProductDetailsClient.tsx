@@ -252,7 +252,7 @@ export const ProductDetailsClient = ({ product, categoryHierarchy, initialReview
                       <div className="flex items-center gap-2">
                         <div className="flex text-brand-500">
                           {[1, 2, 3, 4, 5].map((star) => (
-                            <Star key={star} size={16} fill={star <= averageRating ? "currentColor" : "none"} className={star > averageRating ? "text-zinc-700" : ""} />
+                            <Star key={star} size={16} fill={star <= Number(averageRating) ? "currentColor" : "none"} className={star > Number(averageRating) ? "text-zinc-700" : ""} />
                           ))}
                         </div>
                         <span className="font-bold text-white">{averageRating} / 5</span>
