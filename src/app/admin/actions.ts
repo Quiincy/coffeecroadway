@@ -167,6 +167,36 @@ export async function updateSettings(formData: FormData) {
   revalidatePath('/', 'layout') // revalidate entire layout for footer
 }
 
+export async function updateServicesSettings(formData: FormData) {
+  const supabase = await createClient()
+  
+  const rental_equipment_options = formData.get('rental_equipment_options') as string
+
+  // We assume there's only one row in site_settings.
+  const { data: existing, error: fetchError } = await supabase.from('site_settings').select('id').limit(1).maybeSingle()
+
+  if (fetchError) {
+    console.error('Error fetching settings:', fetchError)
+  }
+
+  if (existing) {
+    const { error } = await supabase.from('site_settings').update({
+      rental_equipment_options,
+      updated_at: new Date().toISOString()
+    }).eq('id', existing.id)
+    if (error) console.error('Error updating services settings:', error)
+  } else {
+    const { error } = await supabase.from('site_settings').insert({
+      rental_equipment_options,
+    })
+    if (error) console.error('Error inserting services settings:', error)
+  }
+
+  revalidatePath('/admin/services')
+  revalidatePath('/services/rent')
+  revalidatePath('/', 'layout')
+}
+
 export async function updateCategory(formData: FormData) {
   const supabase = await createClient()
 
@@ -332,4 +362,115 @@ export async function replyToReview(reviewId: string, replyText: string) {
 
   revalidatePath(`/catalog`)
   revalidatePath(`/admin/reviews`)
+}
+
+export async function approveReview(reviewId: string) {
+  const supabase = await createClient()
+  
+  if (!reviewId) throw new Error('Invalid review ID')
+
+  const { error } = await supabase.from('reviews').update({
+    status: 'approved'
+  }).eq('id', reviewId)
+
+  if (error) {
+    console.error('Error approving review:', error)
+    throw new Error('Failed to approve review')
+  }
+
+  revalidatePath(`/catalog`)
+  revalidatePath(`/admin/reviews`)
+}
+
+export async function deleteReviewAdmin(reviewId: string) {
+  const supabase = await createClient()
+  
+  if (!reviewId) throw new Error('Invalid review ID')
+
+  const { error } = await supabase.from('reviews').delete().eq('id', reviewId)
+
+  if (error) {
+    console.error('Error deleting review:', error)
+    throw new Error('Failed to delete review')
+  }
+
+  revalidatePath(`/catalog`)
+  revalidatePath(`/admin/reviews`)
+}
+
+export async function submitQuestion(productId: string, userName: string, questionText: string) {
+  const supabase = await createClient()
+  
+  if (!productId || !userName || !questionText) {
+    throw new Error('Invalid question data')
+  }
+
+  const { error } = await supabase.from('product_questions').insert({
+    product_id: productId,
+    user_name: userName,
+    question_text: questionText
+  })
+
+  if (error) {
+    console.error('Error submitting question:', error)
+    throw new Error('Failed to submit question')
+  }
+
+  revalidatePath(`/catalog`)
+  revalidatePath(`/admin/questions`)
+}
+
+export async function replyToQuestion(questionId: string, replyText: string) {
+  const supabase = await createClient()
+  
+  if (!questionId || !replyText) {
+    throw new Error('Invalid reply data')
+  }
+
+  const { error } = await supabase.from('product_questions').update({
+    reply_text: replyText,
+    reply_created_at: new Date().toISOString()
+  }).eq('id', questionId)
+
+  if (error) {
+    console.error('Error replying to question:', error)
+    throw new Error('Failed to reply to question')
+  }
+
+  revalidatePath(`/catalog`)
+  revalidatePath(`/admin/questions`)
+}
+
+export async function approveQuestion(questionId: string) {
+  const supabase = await createClient()
+  
+  if (!questionId) throw new Error('Invalid question ID')
+
+  const { error } = await supabase.from('product_questions').update({
+    status: 'approved'
+  }).eq('id', questionId)
+
+  if (error) {
+    console.error('Error approving question:', error)
+    throw new Error('Failed to approve question')
+  }
+
+  revalidatePath(`/catalog`)
+  revalidatePath(`/admin/questions`)
+}
+
+export async function deleteQuestionAdmin(questionId: string) {
+  const supabase = await createClient()
+  
+  if (!questionId) throw new Error('Invalid question ID')
+
+  const { error } = await supabase.from('product_questions').delete().eq('id', questionId)
+
+  if (error) {
+    console.error('Error deleting question:', error)
+    throw new Error('Failed to delete question')
+  }
+
+  revalidatePath(`/catalog`)
+  revalidatePath(`/admin/questions`)
 }

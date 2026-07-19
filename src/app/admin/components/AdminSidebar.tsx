@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { LayoutDashboard, ShoppingBag, Settings, LogOut, Coffee, Package, Tags, Menu, X, MessageSquare } from 'lucide-react'
+import { LayoutDashboard, ShoppingBag, Settings, LogOut, Coffee, Package, Tags, Menu, X, MessageSquare, Wrench, HelpCircle } from 'lucide-react'
 
 export default function AdminSidebar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -38,9 +38,9 @@ export default function AdminSidebar() {
             <LayoutDashboard size={20} />
             Дашборд
           </Link>
-          <Link onClick={() => setIsOpen(false)} href="/admin/orders" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors">
+          <Link onClick={() => setIsOpen(false)} href="/admin/requests" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors">
             <ShoppingBag size={20} />
-            Замовлення
+            Заявки
           </Link>
           <Link onClick={() => setIsOpen(false)} href="/admin/items" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors">
             <Package size={20} />
@@ -53,6 +53,14 @@ export default function AdminSidebar() {
           <Link onClick={() => setIsOpen(false)} href="/admin/reviews" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors">
             <MessageSquare size={20} />
             Відгуки
+          </Link>
+          <Link onClick={() => setIsOpen(false)} href="/admin/questions" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors">
+            <HelpCircle size={20} />
+            Питання
+          </Link>
+          <Link onClick={() => setIsOpen(false)} href="/admin/services" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors">
+            <Wrench size={20} />
+            Наші послуги
           </Link>
           <Link onClick={() => setIsOpen(false)} href="/admin/settings" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors">
             <Settings size={20} />

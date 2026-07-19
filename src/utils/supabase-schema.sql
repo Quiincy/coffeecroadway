@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS site_settings (
   social_facebook TEXT,
   telegram_bot_token TEXT,
   telegram_chat_id TEXT,
+  rental_equipment_options TEXT,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -148,6 +149,7 @@ CREATE TABLE IF NOT EXISTS reviews (
   user_name TEXT NOT NULL,
   rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
   review_text TEXT NOT NULL,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   reply_text TEXT,
   reply_created_at TIMESTAMP WITH TIME ZONE
@@ -157,11 +159,33 @@ CREATE TABLE IF NOT EXISTS reviews (
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Public read access to reviews" ON reviews;
-CREATE POLICY "Public read access to reviews" ON reviews FOR SELECT USING (true);
+CREATE POLICY "Public read access to reviews" ON reviews FOR SELECT USING (status = 'approved');
 
 DROP POLICY IF EXISTS "Public insert access to reviews" ON reviews;
--- Allow anyone to insert, but they cannot set reply_text or reply_created_at
-CREATE POLICY "Public insert access to reviews" ON reviews FOR INSERT WITH CHECK (reply_text IS NULL AND reply_created_at IS NULL);
+-- Allow anyone to insert, but they cannot set reply_text, reply_created_at, or force status to approved
+CREATE POLICY "Public insert access to reviews" ON reviews FOR INSERT WITH CHECK (reply_text IS NULL AND reply_created_at IS NULL AND (status IS NULL OR status = 'pending'));
 
 DROP POLICY IF EXISTS "Admin full access to reviews" ON reviews;
 CREATE POLICY "Admin full access to reviews" ON reviews FOR ALL USING (auth.role() = 'authenticated');
+
+-- 7. service_requests
+CREATE TABLE IF NOT EXISTS service_requests (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  type TEXT NOT NULL CHECK (type IN ('repair', 'rental', 'maintenance')),
+  customer_name TEXT NOT NULL,
+  customer_phone TEXT NOT NULL,
+  details JSONB DEFAULT '{}'::jsonb,
+  status TEXT DEFAULT 'new' CHECK (status IN ('new', 'in_progress', 'completed', 'cancelled')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Setup RLS for service_requests
+ALTER TABLE service_requests ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public insert access to service_requests" ON service_requests;
+CREATE POLICY "Public insert access to service_requests" ON service_requests FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Admin full access to service_requests" ON service_requests;
+CREATE POLICY "Admin full access to service_requests" ON service_requests FOR ALL USING (auth.role() = 'authenticated');
+

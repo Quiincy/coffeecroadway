@@ -1,22 +1,20 @@
 'use client'
 
 import React, { useState, useTransition } from 'react'
-import { Star, X } from 'lucide-react'
-import { submitReview } from '@/app/admin/actions'
+import { HelpCircle, X } from 'lucide-react'
+import { submitQuestion } from '@/app/admin/actions'
 import { useFormStorage } from '@/hooks/useFormStorage'
 
-interface ReviewModalProps {
+interface QuestionModalProps {
   isOpen: boolean;
   onClose: () => void;
   productName: string;
   productId: string;
 }
 
-export const ReviewModal = ({ isOpen, onClose, productName, productId }: ReviewModalProps) => {
-  const [rating, setRating] = useState(0)
-  const [hoveredRating, setHoveredRating] = useState(0)
-  const [name, setName, clearName] = useFormStorage('coffee_review_name', '')
-  const [review, setReview, clearReview] = useFormStorage('coffee_review_text', '')
+export const QuestionModal = ({ isOpen, onClose, productName, productId }: QuestionModalProps) => {
+  const [name, setName, clearName] = useFormStorage('coffee_question_name', '')
+  const [question, setQuestion, clearQuestion] = useFormStorage('coffee_question_text', '')
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -27,20 +25,19 @@ export const ReviewModal = ({ isOpen, onClose, productName, productId }: ReviewM
     
     startTransition(async () => {
       try {
-        await submitReview(productId, name, rating, review)
+        await submitQuestion(productId, name, question)
         setIsSubmitted(true)
         setTimeout(() => {
           onClose()
           setIsSubmitted(false)
-          setRating(0)
           setName('')
-          setReview('')
+          setQuestion('')
           clearName()
-          clearReview()
+          clearQuestion()
         }, 2000)
       } catch (error) {
-        console.error("Failed to submit review:", error)
-        alert("Помилка при надсиланні відгуку. Спробуйте пізніше.")
+        console.error("Failed to submit question:", error)
+        alert("Помилка при надсиланні питання. Спробуйте пізніше.")
       }
     })
   }
@@ -55,40 +52,19 @@ export const ReviewModal = ({ isOpen, onClose, productName, productId }: ReviewM
           <X size={24} />
         </button>
 
-        <h2 className="text-2xl font-bold text-white mb-2">Написати відгук</h2>
+        <h2 className="text-2xl font-bold text-white mb-2">Задати питання</h2>
         <p className="text-zinc-400 mb-6 text-sm line-clamp-1">{productName}</p>
 
         {isSubmitted ? (
           <div className="flex flex-col items-center justify-center py-10 text-center">
             <div className="w-16 h-16 bg-brand-500/20 text-brand-500 rounded-full flex items-center justify-center mb-4">
-              <Star size={32} fill="currentColor" />
+              <HelpCircle size={32} />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Дякуємо за відгук!</h3>
-            <p className="text-zinc-400">Ваш відгук надіслано на модерацію.</p>
+            <h3 className="text-xl font-bold text-white mb-2">Дякуємо!</h3>
+            <p className="text-zinc-400">Ваше питання успішно відправлено.</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col items-center mb-2">
-              <span className="text-sm font-medium text-zinc-400 mb-2">Ваша оцінка</span>
-              <div className="flex items-center gap-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    className="focus:outline-none transition-transform hover:scale-110"
-                    onMouseEnter={() => setHoveredRating(star)}
-                    onMouseLeave={() => setHoveredRating(0)}
-                    onClick={() => setRating(star)}
-                  >
-                    <Star 
-                      size={32} 
-                      className={`${(hoveredRating || rating) >= star ? 'text-brand-500 fill-brand-500' : 'text-zinc-700'} transition-colors`} 
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
-
             <input 
               type="text" 
               placeholder="Ваше ім'я" 
@@ -99,20 +75,20 @@ export const ReviewModal = ({ isOpen, onClose, productName, productId }: ReviewM
             />
             
             <textarea 
-              placeholder="Ваш відгук" 
+              placeholder="Ваше питання" 
               rows={4} 
-              value={review}
-              onChange={(e) => setReview(e.target.value)}
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
               required
               className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-500 transition-colors resize-none"
             ></textarea>
             
             <button 
               type="submit" 
-              disabled={rating === 0 || !name.trim() || !review.trim() || isPending}
+              disabled={!name.trim() || !question.trim() || isPending}
               className="bg-brand-500 text-white font-bold py-3 rounded-xl hover:bg-brand-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2 shadow-[0_0_15px_rgba(255,92,10,0.3)]"
             >
-              {isPending ? 'Надсилання...' : 'Надіслати відгук'}
+              {isPending ? 'Відправка...' : 'Відправити питання'}
             </button>
           </form>
         )}

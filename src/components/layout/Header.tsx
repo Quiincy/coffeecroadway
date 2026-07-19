@@ -87,14 +87,14 @@ export default function Header({ categories = [] }: { categories?: any[] }) {
           </div>
 
           <nav className="hidden lg:flex items-center gap-6 font-bold text-sm uppercase text-white">
-            <Link href="/rent" className="hover:text-brand-500 transition-colors">Оренда</Link>
+            <Link href="/services" className="hover:text-brand-500 transition-colors">Послуги</Link>
             <Link href="/contacts" className="hover:text-brand-500 transition-colors">Контакти</Link>
           </nav>
         </div>
 
         {/* Logo */}
         <div className="flex-1 flex items-center lg:flex-none lg:absolute lg:left-1/2 lg:-translate-x-1/2 overflow-hidden mr-2">
-          <Link href="/" className="flex items-center text-white font-black text-xl sm:text-2xl lg:text-3xl uppercase tracking-widest hover:text-brand-500 transition-colors whitespace-nowrap truncate">
+          <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center text-white font-black text-xl sm:text-2xl lg:text-3xl uppercase tracking-widest hover:text-brand-500 transition-colors whitespace-nowrap truncate">
             <span>C</span>
             <Coffee className="text-brand-500 mx-1 w-6 h-6 sm:w-6 sm:h-6 lg:w-7 lg:h-7 shrink-0" strokeWidth={3} />
             <span>FFEE</span>
@@ -117,7 +117,7 @@ export default function Header({ categories = [] }: { categories?: any[] }) {
             )}
           </Link>
 
-          <Link href="/checkout" className="relative text-white hover:text-brand-500 transition-colors p-1">
+          <Link href="/checkout" onClick={() => setIsMobileMenuOpen(false)} className="relative text-white hover:text-brand-500 transition-colors p-1">
             <ShoppingCart size={22} />
             {totalItems > 0 && (
               <span className="absolute -top-1 -right-1 bg-brand-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">
@@ -227,7 +227,7 @@ export default function Header({ categories = [] }: { categories?: any[] }) {
                 </div>
               </details>
               
-              <Link href="/rent" onClick={() => setIsMobileMenuOpen(false)} className="font-bold text-lg text-white p-4 hover:bg-zinc-800/50 transition-colors border-b border-zinc-800">ОРЕНДА</Link>
+              <Link href="/services" onClick={() => setIsMobileMenuOpen(false)} className="font-bold text-lg text-white p-4 hover:bg-zinc-800/50 transition-colors border-b border-zinc-800">ПОСЛУГИ</Link>
               <Link href="/contacts" onClick={() => setIsMobileMenuOpen(false)} className="font-bold text-lg text-white p-4 hover:bg-zinc-800/50 transition-colors">КОНТАКТИ</Link>
             </div>
           </div>

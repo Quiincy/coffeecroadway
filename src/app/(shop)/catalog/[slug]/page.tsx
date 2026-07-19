@@ -70,12 +70,21 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     .from('reviews')
     .select('*')
     .eq('product_id', product.id)
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false });
+
+  // Fetch questions for this product
+  const { data: questions } = await supabase
+    .from('product_questions')
+    .select('*')
+    .eq('product_id', product.id)
+    .eq('status', 'approved')
     .order('created_at', { ascending: false });
 
   return (
     <AnimatedPage className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="bg-zinc-900/40 p-6 md:p-10 rounded-3xl border border-zinc-800/80 shadow-2xl">
-        <ProductDetailsClient product={product} categoryHierarchy={hierarchy} initialReviews={reviews || []} />
+        <ProductDetailsClient product={product} categoryHierarchy={hierarchy} initialReviews={reviews || []} initialQuestions={questions || []} />
       </div>
 
       <RecentlyViewed currentProductId={product.id} />

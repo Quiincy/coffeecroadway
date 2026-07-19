@@ -10,6 +10,7 @@ import { useCompare } from "@/components/providers/CompareProvider";
 import { ImageGallery } from "@/components/ui/ImageGallery";
 import { Accordion } from "@/components/ui/Accordion";
 import { ReviewModal } from "@/components/ui/ReviewModal";
+import { QuestionModal } from "@/components/ui/QuestionModal";
 
 interface Category {
   id: string;
@@ -35,9 +36,10 @@ interface ProductDetailsClientProps {
   product: Product;
   categoryHierarchy: Category[];
   initialReviews?: any[];
+  initialQuestions?: any[];
 }
 
-export const ProductDetailsClient = ({ product, categoryHierarchy, initialReviews = [] }: ProductDetailsClientProps) => {
+export const ProductDetailsClient = ({ product, categoryHierarchy, initialReviews = [], initialQuestions = [] }: ProductDetailsClientProps) => {
   const router = useRouter();
   const { addItem } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -45,6 +47,9 @@ export const ProductDetailsClient = ({ product, categoryHierarchy, initialReview
   
   const [quantity, setQuantity] = useState(1);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [currentReviewPage, setCurrentReviewPage] = useState(1);
+  const [currentQuestionPage, setCurrentQuestionPage] = useState(1);
+  const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
   const favorite = isFavorite(product.id);
   const compared = isCompared(product.id);
 
@@ -57,6 +62,20 @@ export const ProductDetailsClient = ({ product, categoryHierarchy, initialReview
     : product.image 
       ? [product.image] 
       : [];
+
+  const REVIEWS_PER_PAGE = 2;
+  const totalReviewPages = Math.ceil(initialReviews.length / REVIEWS_PER_PAGE);
+  const currentReviews = initialReviews.slice(
+    (currentReviewPage - 1) * REVIEWS_PER_PAGE,
+    currentReviewPage * REVIEWS_PER_PAGE
+  );
+
+  const QUESTIONS_PER_PAGE = 2;
+  const totalQuestionPages = Math.ceil(initialQuestions.length / QUESTIONS_PER_PAGE);
+  const currentQuestions = initialQuestions.slice(
+    (currentQuestionPage - 1) * QUESTIONS_PER_PAGE,
+    currentQuestionPage * QUESTIONS_PER_PAGE
+  );
 
   const handleDecrease = () => {
     if (quantity > 1) setQuantity(q => q - 1);
@@ -265,7 +284,7 @@ export const ProductDetailsClient = ({ product, categoryHierarchy, initialReview
                   </div>
 
                   <div className="space-y-4 mt-2">
-                    {initialReviews.map((review) => (
+                    {currentReviews.map((review) => (
                       <div key={review.id} className="border-t border-zinc-800/50 pt-4 flex flex-col gap-2">
                         <div className="flex items-center justify-between">
                           <span className="font-bold text-white text-sm">{review.user_name}</span>
@@ -292,17 +311,100 @@ export const ProductDetailsClient = ({ product, categoryHierarchy, initialReview
                       </div>
                     ))}
                   </div>
+
+                  {/* Pagination */}
+                  {totalReviewPages > 1 && (
+                    <div className="flex justify-center items-center gap-2 mt-6 pt-4 border-t border-zinc-800/50">
+                      {Array.from({ length: totalReviewPages }).map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setCurrentReviewPage(i + 1)}
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium transition-colors ${
+                            currentReviewPage === i + 1 
+                              ? 'bg-brand-500 text-white' 
+                              : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white'
+                          }`}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </Accordion>
 
-            <Accordion title="Задати питання">
-              <form className="flex flex-col gap-4 mt-2">
-                <input type="text" placeholder="Ваше ім'я" className="bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-500" />
-                <input type="email" placeholder="Ваш Email" className="bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-500" />
-                <textarea placeholder="Ваше питання" rows={4} className="bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-500"></textarea>
-                <button type="button" className="bg-brand-500 text-white font-bold py-3 rounded-lg hover:bg-brand-400 transition-colors">Відправити питання</button>
-              </form>
+            <Accordion 
+              title={
+                <div className="flex items-center justify-between w-full pr-4">
+                  <span>Питання</span>
+                  {initialQuestions.length > 0 && (
+                    <span className="bg-zinc-800 text-xs font-bold px-2 py-1 rounded-md text-zinc-300">
+                      {initialQuestions.length}
+                    </span>
+                  )}
+                </div>
+              }
+            >
+              {initialQuestions.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-6 text-zinc-500">
+                  <MessageSquare size={32} className="mb-3 opacity-20" />
+                  <p>Питань про цей товар ще не було.</p>
+                  <button onClick={() => setIsQuestionModalOpen(true)} className="mt-4 text-brand-500 font-medium hover:underline">Задати питання</button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-6 pt-2 pb-4">
+                  <div className="flex items-center justify-end">
+                    <button onClick={() => setIsQuestionModalOpen(true)} className="text-brand-500 text-sm font-medium hover:underline flex items-center gap-1">
+                      <MessageSquare size={14} />
+                      Задати питання
+                    </button>
+                  </div>
+
+                  <div className="space-y-4 mt-2">
+                    {currentQuestions.map((q) => (
+                      <div key={q.id} className="border-t border-zinc-800/50 pt-4 flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-white text-sm">{q.user_name}</span>
+                          <span className="text-zinc-500 text-xs">{new Date(q.created_at).toLocaleDateString('uk-UA')}</span>
+                        </div>
+                        <p className="text-zinc-300 text-sm">{q.question_text}</p>
+                        
+                        {q.reply_text && (
+                          <div className="mt-3 ml-4 pl-4 border-l-2 border-brand-500/30 bg-zinc-900/50 p-3 rounded-r-lg">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-bold text-brand-500 text-xs">Coffee Broadway</span>
+                              {q.reply_created_at && (
+                                <span className="text-zinc-500 text-[10px]">{new Date(q.reply_created_at).toLocaleDateString('uk-UA')}</span>
+                              )}
+                            </div>
+                            <p className="text-zinc-400 text-sm">{q.reply_text}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Pagination */}
+                  {totalQuestionPages > 1 && (
+                    <div className="flex justify-center items-center gap-2 mt-6 pt-4 border-t border-zinc-800/50">
+                      {Array.from({ length: totalQuestionPages }).map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setCurrentQuestionPage(i + 1)}
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium transition-colors ${
+                            currentQuestionPage === i + 1 
+                              ? 'bg-brand-500 text-white' 
+                              : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white'
+                          }`}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </Accordion>
 
             <Accordion title="Характеристики">
@@ -331,6 +433,12 @@ export const ProductDetailsClient = ({ product, categoryHierarchy, initialReview
       <ReviewModal 
         isOpen={isReviewModalOpen} 
         onClose={() => setIsReviewModalOpen(false)} 
+        productName={product.name}
+        productId={product.id}
+      />
+      <QuestionModal
+        isOpen={isQuestionModalOpen}
+        onClose={() => setIsQuestionModalOpen(false)}
         productName={product.name}
         productId={product.id}
       />

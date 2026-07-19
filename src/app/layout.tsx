@@ -28,13 +28,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const supabase = await createClient();
-  const { data: settingsData } = await supabase.from('site_settings').select('*');
-  const initialSettings: SiteSettings = {};
-  if (settingsData) {
-    settingsData.forEach((setting) => {
-      initialSettings[setting.key] = setting.value;
-    });
-  }
+  const { data: settingsData } = await supabase.from('site_settings').select('*').limit(1).maybeSingle();
+  const initialSettings: SiteSettings = settingsData || {};
 
   return (
     <html lang="uk" className="dark">

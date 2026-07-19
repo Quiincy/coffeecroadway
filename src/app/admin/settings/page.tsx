@@ -128,6 +128,8 @@ export default async function SettingsAdmin() {
           </div>
         </div>
 
+
+
         <div className="sticky bottom-4 pt-4 flex justify-end">
           <button type="submit" className="flex items-center gap-2 bg-brand-500 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-400 transition-colors shadow-[0_0_20px_rgba(255,92,10,0.4)]">
             <Save size={20} /> Зберегти налаштування
